@@ -74,11 +74,10 @@ def vector(a):
             return vectorChoice
         quit()
 
-
-def UserChoice():
-    # Vector Choice, Part 1
+def VecChoice():
     print('Choose an initial axis of polarization by entering an abbreviation.')
-    print(' \n x: horizontal \n y: vertical \n d: diagonal \n a: anti-diagonal \n l: left-hand circular \n r: right-hand circular')
+    print(
+        ' \n x: horizontal \n y: vertical \n d: diagonal \n a: anti-diagonal \n l: left-hand circular \n r: right-hand circular')
     a = input()
     if a == 'x' or a == 'y' or a == 'd' or a == 'a' or a == 'l' or a == 'r':
         # b = vector(a)
@@ -88,6 +87,61 @@ def UserChoice():
         return 0
     print(user_input[0])
 
+def ElementChoice(num):
+    x = 'y'
+    while (x == 'y'):
+        print('Enter p to choose polarizer or w to choose wave plate:')
+        choice = input()
+        if choice == 'p':
+            temp_list.append(choice)
+            polarizer()
+        elif choice == 'w':
+            temp_list.append(choice)
+            wavePlate()
+        else:
+            print('Your input was invalid. Try again.')
+            return 0
+        print(temp_list)
+        print(user_input)
+        user_input.insert(num, temp_list.copy())
+        print(user_input)
+        print("Do you want to add another element? \n")
+        print("y: yes \n n:no")
+        x = input()
+        if x == 'y':
+            print("Your current list is: \n", user_input)
+            print("Enter the number of the element before the position of the element you want to add:")
+            num = int(input())
+            #num = num + 1
+        temp_list.clear()
+
+def ElementChange(num):
+    x = 'y'
+    while (x == 'y'):
+        print('Enter p to choose polarizer or w to choose wave plate:')
+        choice = input()
+        if choice == 'p':
+            temp_list.append(choice)
+            polarizer()
+        elif choice == 'w':
+            temp_list.append(choice)
+            wavePlate()
+        else:
+            print('Your input was invalid. Try again.')
+            return 0
+        user_input.pop(num)
+        user_input.insert(num, temp_list.copy())
+        print("Do you want to add another element? \n")
+        print("y: yes \n n:no")
+        x = input()
+        if x == 'y':
+            print("Your current list is: \n", user_input)
+            print("Enter the number of the element before the position of the element you want to add:")
+            num = int(input())
+        temp_list.clear()
+
+def UserChoice():
+    VecChoice()
     x = 'y'
     while (x == 'y'):
         print('Enter p to choose polarizer or w to choose wave plate:')
@@ -131,18 +185,23 @@ def Edit():
         print("Choices: \n r: remove element \n a: add element \n c: change existing element")
         choice = input()
         if choice == 'r':
+            print(user_input)
             print("Enter the number of the element you wish to remove:")
-            num = input()
-            user_input.remove(user_input[num])
+            num = int(input())
+            user_input.pop(num)
+            print("The new list after removing the element is:")
+            print(user_input)
         elif choice == 'a':
+            print("Your current list is: \n", user_input)
             print("Enter the number of the element before the position of the element you want to add:")
-            num = input()
-            #add choice of which element (call function)
-            #add the element
+            num = int(input())
+            ElementChoice(num) #adds one or more elements to correct position in list
         elif choice == 'c':
-            num = input()
+            print("Your current list is: \n", user_input)
             print("Enter the number of the element you want to edit:")
-            #what to change element to (prob better to make function for this and call it)
+            num = int(input())
+            num = num - 1
+            ElementChange(num)
             #change element
 
         #after all changes are made call parseInput with new list (maybe call in menu function, don't know yet which is better)
@@ -232,8 +291,8 @@ def parseInput():
 
 
 def calculateNew():
-    print("inside calculateNew function")
-    print(elements)
+    #print("inside calculateNew function")
+    #print(elements)
     i = len(elements)-1
     m1 = elements[i]
     while i>0:
@@ -260,15 +319,54 @@ def Graph(sol, choice):
     S = create_Stokes("Solution Stokes")
     S.from_Jones(sol)
     if choice=='d':
+        print("Would you like to save the images? y/n")
+        save = input()
         print(S)
-        S.draw_poincare()
-        sol.draw_ellipse(draw_arrow=True, figsize=(9, 5))
+        if save == 'y':
+            print("What would you like to name the file for the Poincare sphere?")
+            sname = input()
+            sfname = sname + '.jpg'
+            S.draw_poincare(filename=sfname)
+            print("What would you like to name the file for the ellipse?")
+            name = input()
+            fname = name + '.jpg'
+            sol.draw_ellipse(filename=fname, draw_arrow=True, figsize=(9, 5))
+        elif save == 'n':
+            fig = sol.draw_ellipse()
+            # fig.show()
+            fig2= S.draw_poincare()
+            fig2.show()
     elif choice=='a':
         print(S)
     elif choice == 'b':
-        sol.draw_ellipse(draw_arrow=True, figsize=(9, 5))
+        print("Would you like to save the image? y/n")
+        save = input()
+        if save == 'y':
+            print("What would you like to name the file for the ellipse?")
+            name = input()
+            fname = name + '.jpg'
+            sol.draw_ellipse(filename = fname, draw_arrow=True, figsize=(9, 5))
+        elif save == 'n':
+            fig=sol.draw_ellipse(draw_arrow=True, figsize=(9, 5))
+            fig.show()
     elif choice == 'c':
-        S.draw_poincare()
+        print("Would you like to save the image? y/n")
+        save = input()
+        if save == 'y':
+            print("What would you like to name the file for the Poincare sphere?")
+            sname = input()
+            sfname = sname + '.jpg'
+            fig =S.draw_poincare(filename=sfname)
+            fig.show()
+        elif save == 'n':
+            fig= S.draw_poincare()
+            fig.show()
+
+def GraphRotate(sol):
+    S = create_Stokes("Solution Stokes")
+    S.from_Jones(sol)
+    fig=S.draw_poincare()
+    fig.show()
 
 def arbitraryPolarizer(angle):
     angle = float(angle)
@@ -304,6 +402,7 @@ def Menu():
         print("What would you like to do now?")
         print(" n: start new calculation")
         print(" e: edit previous calculation")
+        print(" r: show the effects of rotating an element")
         print(" x: exit program")
         new = input()
         if new == 'x':
@@ -312,5 +411,32 @@ def Menu():
             newCalc()
         elif new == 'e':
             Edit()
+            parseInput()
+        elif new == 'r':
+            print("Sorry, this option is not currently supported.")
+            #print("Your current list is: \n", user_input)
+            #print("Enter the number of the element you want to rotate:")
+            #ask user for range to be rotated through
+            #GraphRotate()
 
 Menu()
+
+
+# S = Stokes('Linear light')
+# S.linear_light(azimuth=0, degree_pol=0.5)
+# fig = S.draw_poincare(depol=True) #error says depol is unexpected
+# fig.show()
+
+# S = Stokes('Linear light')
+# S.linear_light(azimuth=0)
+# print(S)
+# S.draw_poincare()
+
+# S = Stokes('Linear light')
+# S.linear_light(azimuth=90*degrees)
+# fig = S.draw_poincare(figsize=(4,4), draw_axes=False, draw_guides=False, show_fig=True)
+#
+# S = Stokes('Linear light')
+# S.general_azimuth_ellipticity(azimuth=np.linspace(0,179*degrees,13), ellipticity=np.linspace(0,45*degrees,13))
+# fig = S.draw_poincare(kind="scatterline")
+# fig.show()
